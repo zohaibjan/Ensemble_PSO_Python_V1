@@ -15,6 +15,7 @@ from sklearn.cluster import KMeans
 from optimizeEnsemble import optimizeEnsemble
 import matplotlib.pyplot as plt
 from sklearn.metrics import silhouette_score
+from sklearn import preprocessing
 warnings.filterwarnings('ignore')
 
 def mainProgram(dataset):
@@ -31,6 +32,8 @@ def mainProgram(dataset):
     Y_train_clusters = []
     for train, test in kf.split(X):
     	X_train, X_test, Y_train, Y_test = X[train], X[test], Y[train], Y[test]
+    	X_train = preprocessing.normalize(X_train)
+    	X_test  = preprocessing.normalize(X_test)        
     	sil = []
         #dissimilarity would not be defined for a single cluster, thus, minimum number of clusters should be 2
     	K = range(2,20);
@@ -64,13 +67,13 @@ def mainProgram(dataset):
     	valy = Y_test[0:count]
     	X_test = X_test[count:]
     	Y_test = Y_test[count:]  	
-    	print("Now training classifiers")
+    	
     	ensemble = trainClassifiers(X_train_clusters, Y_train_clusters)
     	acc += decisionFusion(ensemble, X_test, Y_test)        
-    	print("Now running Particle Swarm Optimization")
+    	
     	optimized_ensemble = optimizeEnsemble(ensemble, valX, valy)
     	optimized_acc += decisionFusion(optimized_ensemble, X_test, Y_test)        
     	current_fold += 1
-        
-    return ((acc/current_fold), (optimized_acc/current_fold))
+    	print ("Non_optimized and Optimized Accuracy for " + dataset  + " is: " + str(acc/current_fold) + " and " + str(optimized_acc/current_fold))   
+    return ((acc/current_fold), (acc/current_fold))
       
