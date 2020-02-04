@@ -23,17 +23,12 @@ def optimizeEnsemble(ensemble, valX, valy):
                 continue
         results = predictions.mode(axis='columns')[0]
         results = np.asarray(results)
-        acc = 0
-        for i in range(len(results)):
-            if (int(results[i]) == valy[i]):
-                acc+= 1
-        P = acc/len(valy)
-        #j = (a * (1.0 - P) + (1.0 - a) * (1 - (index / total_features)))
-        j=1-P
-       # print("Minimizing current error : " + str(error))
+        P = (results == valy).mean()
+        j = (a * (1.0 - P) + (1.0 - a) * (1 - (index / total_features)))
+    
         return j
     
-    def f(x, alpha=0.88):
+    def f(x, alpha=0.50):
         n_particles = x.shape[0]
         j = [f_per_particle(x[i], alpha) for i in range(n_particles)]
         return np.array(j)   
@@ -49,7 +44,7 @@ def optimizeEnsemble(ensemble, valX, valy):
     optimizer = ps.discrete.BinaryPSO(n_particles=30, dimensions=dimensions, options=options)
 
     # Perform optimization
-    cost, pos = optimizer.optimize(f, iters=10)
+    cost, pos = optimizer.optimize(f, iters=100)
     print("Optimization process completed with a cost of : " + str(cost))
     
     for i in range(len(pos)):
