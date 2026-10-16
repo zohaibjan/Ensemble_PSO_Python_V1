@@ -1,36 +1,29 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec  4 12:12:00 2019
-
-@author: janz
-"""
-
-from mainProgram import mainProgram
-import numpy as np
+"""Run the historical ensemble experiments and append one CSV row per dataset."""
 import csv
-import os.path
+from pathlib import Path
 
-data = {'thyroid','wine','diabetes',\
-        'segment', 'ecoli','cancer',\
-        'vehicle','iris','liver','ionosphere',\
-        'sonar','glass'}
+import numpy as np
+from mainProgram import mainProgram
 
-numOfRuns = 1
-for dataset in data:
-    if os.path.isfile('results.csv'):
-        file = open("results.csv", mode="a")
-        results = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)    
-    else:
-        file = open("results.csv", mode="w")
-        results = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)    
-        results.writerow(['dataset', 'accuracy','optimized_accuracy'])
-    accuracy = np.zeros(numOfRuns)
-    optimized_accuracy = np.zeros(numOfRuns)
-    results.writerow(['dataset', 'accuracy','optimized_accuracy'])
-    for i in range(numOfRuns):
-        temp = mainProgram(dataset)
-        accuracy[i] = temp[0]
-        optimized_accuracy = temp[1]
-    results.writerow([dataset, str(np.mean(accuracy)),str(np.mean(optimized_accuracy))])
-file.close();
-print ("Non_optimized and Optimized Accuracy for " + dataset  + " is: " + str(np.mean(accuracy)) + " and " + str(np.mean(optimized_accuracy)))
+DATASETS = ('thyroid', 'wine', 'diabetes', 'segment', 'ecoli', 'cancer',
+            'vehicle', 'iris', 'liver', 'ionosphere', 'sonar', 'glass')
+
+
+def run_experiments(datasets=DATASETS, num_runs=1, output='results.csv'):
+    if num_runs < 1:
+        raise ValueError('num_runs must be at least one')
+    output = Path(output)
+    for dataset in datasets:
+        scores = [mainProgram(dataset) for _ in range(num_runs)]
+        accuracy, optimized_accuracy = np.mean(scores, axis=0)
+        needs_header = not output.exists() or output.stat().st_size == 0
+        with output.open('a', newline='', encoding='utf-8') as handle:
+            writer = csv.writer(handle)
+            if needs_header:
+                writer.writerow(['dataset', 'accuracy', 'optimized_accuracy'])
+            writer.writerow([dataset, accuracy, optimized_accuracy])
+        print(f'{dataset}: baseline={accuracy}, optimized={optimized_accuracy}')
+
+
+if __name__ == '__main__':
+    run_experiments()

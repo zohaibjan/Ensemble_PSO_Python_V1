@@ -12,16 +12,24 @@ A Python research prototype exploring clustering, base classifiers, decision fus
 
 ## Dataset format
 
-Datasets are CSV files. The final column contains the class label. Update the `data` collection in `runProgram.py` to select dataset names.
+Datasets are CSV files. The final column contains the class label. Update `DATASETS` in `runProgram.py` to select dataset names.
 
 ```bash
 python runProgram.py
 ```
 
-Run from the repository root after installing the dependencies imported by the modules. There is no pinned environment; inspect all imports and establish a compatible research environment first.
+Run from the repository root after installing NumPy, pandas, SciPy, scikit-learn, Matplotlib and PySwarms in your own virtual environment. The accidentally committed virtual environment and bytecode have been removed from the current tree. Check that every selected CSV exists: `wine` is in the historical default list but `wine.csv` is not bundled. The script opens Matplotlib plots during experiments. There is no pinned environment; inspect all imports and establish a compatible research environment first.
 
 ## Research status
 
-This is an early experimental implementation, retained for research provenance. Before using its reported metrics, review fold isolation, validation splitting and the returned baseline/optimised values in `mainProgram.py`. Treat the code as a starting point for reproducibility work, not as a validated benchmark or production library.
+This is an early experimental implementation, retained for research provenance. The cleanup resets cluster lists for every fold and returns the measured optimised score separately from the baseline. These fixes can change results; old CSV outputs are not a benchmark for the corrected code. Validation currently uses a disjoint portion of each held-out fold, so record that protocol when reporting scores. Treat the code as a starting point for reproducibility work, not as a validated benchmark or production library.
 
 [Profile and project directory](https://github.com/zohaibjan)
+
+## Focused regression checks
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Synthetic tests replace expensive clustering, learners and optimisation to check fold isolation, separate returned scores and CSV header/append handling. They do not reproduce model quality. Review empty PSO selections and legacy scikit-learn APIs before a full experiment.
