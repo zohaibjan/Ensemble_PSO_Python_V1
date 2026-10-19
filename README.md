@@ -18,7 +18,7 @@ Datasets are CSV files. The final column contains the class label. Update `DATAS
 python runProgram.py
 ```
 
-Run from the repository root after installing NumPy, pandas, SciPy, scikit-learn, Matplotlib and PySwarms in your own virtual environment. The accidentally committed virtual environment and bytecode have been removed from the current tree. Check that every selected CSV exists: `wine` is in the historical default list but `wine.csv` is not bundled. The script opens Matplotlib plots during experiments. There is no pinned environment; inspect all imports and establish a compatible research environment first.
+Run from the repository root after installing NumPy, pandas, SciPy, scikit-learn, Matplotlib and PySwarms in your own virtual environment. The accidentally committed virtual environment and bytecode have been removed from the current tree. The current tree includes `wine.csv` and the default dataset CSVs. Check any additional names you add before running. The script opens Matplotlib plots during experiments. There is no pinned environment; inspect all imports and establish a compatible research environment first.
 
 ## Research status
 
@@ -33,3 +33,7 @@ python -m unittest discover -s tests -v
 ```
 
 Synthetic tests replace expensive clustering, learners and optimisation to check fold isolation, separate returned scores and CSV header/append handling. They do not reproduce model quality. Review empty PSO selections and legacy scikit-learn APIs before a full experiment.
+
+## Automated checks
+
+GitHub Actions runs offline regression checks on pushes and pull requests. These do not deploy the app, call paid AI services or establish model quality. `requirements-test.txt` supports the mocked orchestration tests, not a fully reproduced PSO training environment. 

@@ -13,9 +13,18 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 optimizer_module = types.ModuleType('optimizeEnsemble')
 optimizer_module.optimizeEnsemble = Mock()
-with patch.dict(sys.modules, {'optimizeEnsemble': optimizer_module}):
+# Replace only this dependency. Restoring the entire sys.modules dictionary
+# removes newly imported NumPy/SciPy extension modules and can break re-imports.
+_previous_optimizer = sys.modules.get('optimizeEnsemble')
+sys.modules['optimizeEnsemble'] = optimizer_module
+try:
     experiment = importlib.import_module('mainProgram')
     runner = importlib.import_module('runProgram')
+finally:
+    if _previous_optimizer is None:
+        sys.modules.pop('optimizeEnsemble', None)
+    else:
+        sys.modules['optimizeEnsemble'] = _previous_optimizer
 
 
 class FakeKMeans:
